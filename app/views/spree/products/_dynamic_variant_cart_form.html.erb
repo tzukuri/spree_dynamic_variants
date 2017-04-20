@@ -1,33 +1,29 @@
-<%= form_for :order, :url => variant_populate_orders_path do |f| %>
+<%= form_for :order, :url => variant_populate_orders_path, html: { multipart: true } do |f| %>
   <div id="inside-product-cart-form" data-hook="inside_dynamic_variant_product_cart_form">
 
-    <table>
-      <tbody>
-      <% @product.option_types.each do |ot| %>
-        <tr>
-          <td><%= ot.presentation  %></td>
-          <td><%= select("options", ot.id, ot.option_values.collect {|ov| [ ov.presentation, ov.id ] }) %></td>
-        </tr>
-      <% end %>
-    </table>
+    <% @product.option_types.each do |ot| %>
+      <label class="text-uppercase"><%= ot.presentation %></label>
+      <%= select("options", ot.id, ot.option_values.collect {|ov| [ ov.presentation, ov.id ] }, {}, { :class => "#{ot.name}" }) %>
+    <% end %>
+
     <%= hidden_field_tag "product_id", @product.id %>
 
     <% if @product.price_in(current_currency) and !@product.price.nil? %>
-      <div data-hook="product_price" class="columns five <% if !@product.has_variants? %> alpha <% else %> omega <% end %>">
+      <div data-hook="product_price">
 
-        <div id="product-price">
-          <h6 class="product-section-title"><%= Spree.t(:price) %></h6>
-          <div>
-            <span class="price selling" itemprop="price">
-              <%= display_price(@product) %>
-            </span>
-            <span itemprop="priceCurrency" content="<%= @product.currency %>"></span>
+        <% if @product.accepts_prescription? %>
+          <%= render :partial => "prescription_fields" %>
+        <% end %>
+
+        <% if flash[:error] %>
+          <div id="cart-errors">
+            <p><%= flash[:error] %> </p>
           </div>
-        </div>
+        <% end %>
 
         <div class="add-to-cart">
-          <%= number_field_tag :quantity, 1, :class => 'title', :min => 1 %>
-          <%= button_tag :class => 'large primary', :id => 'add-to-cart-button', :type => :submit do %>
+          <%= number_field_tag :quantity, 1, :class => 'title', :min => 1, :style => "display: none" %>
+          <%= button_tag :class => '', :id => 'add-to-cart-button', :style => 'width: 100%', :type => :submit do %>
             <%= Spree.t(:add_to_cart) %>
           <% end %>
         </div>
