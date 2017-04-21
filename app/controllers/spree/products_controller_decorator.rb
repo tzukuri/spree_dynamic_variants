@@ -6,7 +6,7 @@ Spree::ProductsController.class_eval do
 
   # inject the current product along with variants and option values into javascript
   def inject_product
-    gon.product = JSON.parse(@product.to_json(:include => { :variants => { :include => :option_values }}))
+    gon.product = JSON.parse(@product.to_json(:include => [{ :variants => { :include => :option_values }}, :prices]))
   end
 
 end

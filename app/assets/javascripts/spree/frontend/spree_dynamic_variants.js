@@ -9,16 +9,9 @@ $(document).ready(function() {
       price: $("#price")
     },
     product: gon.product,
-    basePrice: 0,
-    baseCurrency: '',
 
     init: function() {
       this.bindUIActions()
-
-      // set the base price and currency
-      var priceVal = this.elements.price.html().split(' ')
-      this.basePrice = parseFloat(priceVal[0].replace('$', ''))
-      this.baseCurrency = priceVal[1]
 
       // simulate a variant change to make sure everything is up to date on init
       this.handleVariantChange()
@@ -35,20 +28,19 @@ $(document).ready(function() {
     // --------------
 
     handleVariantChange: function() {
-      this.elements.price.html('$' + this.newPrice(this.currentVariant()) + ' ' + this.baseCurrency)
+      var price = this.newPrice(this.currentVariant())
+      this.elements.price.html('$' + parseInt(price.amount) + ' ' + price.currency)
     },
 
     // --------------
     // helper handlers
     // --------------
 
-    // returns a new price by summing the surcharge fields on the option variants
+    // returns a new price object by summing the surcharge fields on the option variants
     newPrice: function(variant) {
-      var surchargeTotal = 0
-      $.each(variant.option_values, function(i, option) {
-        if (option.surcharge) surchargeTotal += parseFloat(option.surcharge)
+      return this.product.prices.find(function(variantPrice) {
+        return variantPrice.variant_id == variant.id
       })
-      return this.basePrice + surchargeTotal
     },
 
     // returns a json object representing the selected option values in the UI
