@@ -1,4 +1,3 @@
-// Placeholder manifest file.
 // the installer will append this file to the app vendored assets here: vendor/assets/javascripts/spree/frontend/all.js'
 $(document).ready(function() {
 
@@ -11,8 +10,10 @@ $(document).ready(function() {
     product: gon.product,
 
     init: function() {
-      this.bindUIActions()
+      // only continue init if a product has been supplied from the controller
+      if (this.product == undefined) return
 
+      this.bindUIActions()
       // simulate a variant change to make sure everything is up to date on init
       this.handleVariantChange()
     },
